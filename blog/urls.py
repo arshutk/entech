@@ -3,6 +3,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('test/', views.test_view),
+
+
     path('', views.home_view, name='home'),
     path('create/', views.post_create_view, name='post_create'),
     path('comment/<str:post_slug>/', views.comment_like_delete_view, name='post_comment'),

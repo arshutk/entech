@@ -194,3 +194,7 @@ def post_edit_view(request, post_slug):
         context['form'] = form
     
     return render(request, 'blog/post_edit.html', context)
+
+
+def test_view(request):
+    return HttpResponse('<h1>Yeah seems alright</h1>')
