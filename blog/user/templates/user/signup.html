@@ -1,0 +1,8 @@
+
+
+<form method="post">
+    {% csrf_token %}   
+    {{acc_form.as_p}}
+    {{pro_form.as_p}}
+    <button type="submit">Click</button>
+</form>

@@ -1,0 +1,242 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block loadmeta %}
+    {% with meta=meta %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock loadmeta %}
+ 
+{% block metadata %}
+    {% with meta=meta %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock metadata %}
+
+{% block content %}    
+
+<div class="container px-5 mx-auto mt-8 mb-20 lg:px-32">
+      {% if messages %}
+      {% for message in messages %}
+          {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+          <div class="flex items-center bg-indigo-500 text-white text-sm font-bold px-4 py-3 mb-6 mt-0" role="alert">
+              <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z"/></svg>
+              <p>{{message}}</p>
+          </div>
+          {% endif %}
+      {% endfor %}
+    {% endif %}
+    <div class="flex flex-col w-full mb-2 text-left ">
+      <h1 class="mb-2 text-3xl font-black tracking-tightertext-black lg:text-7xl md:text-4xl">{{post.title}}</h1>
+      <p class="mt-4 text-lg leading-snug tracking-tight text-blueGray-500 lg:w-2/3">{{post.subtitle}}</p>
+    </div>
+    <div class="flex flex-col lg:flex-row lg:space-x-12">
+      <div class="w-full max-w-screen-sm m-auto mt-12 lg:w-1/4">
+        <div class="p-4 transition duration-500 ease-in-out transform bg-white border rounded-lg ">
+          <div class="flex py-2">
+            <img src="{% static 'blog/default-post.jpg' %}" class="object-cover w-10 h-10 mr-2 rounded-full">
+            <div>
+              <p class="text-sm font-semibold tracking-tight text-black ">{{post.written_by.email}}</p>
+              <p class="text-sm font-normal tracking-tight text-coolGray-400">Blog Writer</p>
+            </div>
+          </div>
+        </div>        
+        <button class="bg-indigo-500 mt-4 font-semibold text-white w-full content-center items-center space-x-2 rounded hover:shadow-lg hover:bg-indigo-800">
+          {% if bookmark_status %}
+            <a href="{% url 'post_bookmark' post.slug %}?action=remove" class="block px-4 py-2">
+              <span class="inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" /> 
+                </svg> 
+                <span style="line-height: 1.2rem;">Remove Bookmark</span>
+              </span>
+            </a>  
+          {% else %}
+            <a href="{% url 'post_bookmark' post.slug %}?action=add" class="block px-4 py-2">
+              <span class="inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg> 
+                  <span style="line-height: 1.2rem;">Bookmark</span>
+              </span>
+            </a>
+          {% endif %}
+        </button>
+
+        <button class="modal-open bg-transparent border mt-4 border-gray-500 hover:border-indigo-500 text-gray-500 hover:text-indigo-500 font-bold py-2 px-4 rounded w-full">Share</button>
+        <!--Modal-->
+        <div class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+          <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+          
+          <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+            
+            <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-white text-sm z-50">
+              <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+              </svg>
+              <span class="text-sm">(Esc)</span>
+            </div>
+
+            <div class="modal-content py-4 text-left px-6">
+              <!--Title-->
+              <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold">Share!</p>
+                <div class="modal-close cursor-pointer z-50">
+                  <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                  </svg>
+                </div>
+              </div>
+
+              <!--Body-->
+              <input type="text" value={{request.build_absolute_uri}} id="copy-btn" class="w-full break">
+
+
+              <!--Footer-->
+              <div class="flex justify-end pt-2 space-x-3">
+                <button class="px-4 bg-indigo-400 py-2 rounded-lg text-white hover:bg-indigo-400" onclick="copyPath()">Copy</button>
+                <button class="modal-close px-4 bg-red-400 py-2 rounded-lg text-white hover:bg-red-400">Close</button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        {% if detail %}
+        <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mt-1 text-center" role="alert">
+          <p class="text-sm">{{detail}}</p>
+        </div>
+        {% endif %}
+        
+        {% if post.written_by == request.user %}
+          <div class="w-full mt-4">
+            <div class="inline-flex w-full text-center space-x-1">
+              <a class="bg-red-300 hover:bg-red-400 text-gray-800 font-bold py-2 px-4 rounded-l flex-1"  href="{% url 'post_edit_delete' post.slug %}?action=delete">
+                Delete Post
+              </a>
+              <a class="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold py-2 px-4 rounded-r flex-1" href="{% url 'post_edit_delete' post.slug %}?action=edit">
+                Edit Post
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="w-full px-4 mt-4 text-lg leading-snug tracking-tight text-blueGray-500 lg:px-0 lg:w-3/4">
+        <p class="pb-6">{{post.content|safe}}</p>
+        {{form}}
+        <div class="flex mb-4 mt-8">
+          <div class="w-1/3 h-12 m-2">
+            <button type="button" class="focus:outline-non text-sm rounded-md 
+              {% if reaction == 'like' %}
+                  text-white bg-blue-400 hover:bg-blue-600 hover:shadow-lg
+              {% else %}
+                  text-blue-400 border border-blue-600 hover:bg-blue-50
+              {% endif %}
+            w-full">
+              <a class="flex py-2.5 px-5" href="{% url 'post_detail' post.slug %}?action=like" >                
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+                  Like
+              </a>
+            </button>
+          </div>
+          <div class="w-1/3 h-12 m-2">
+            <button type="button" class="focus:outline-none text-sm rounded-md 
+              {% if reaction == 'love' %}
+                  text-white bg-pink-400 hover:bg-pink-600 hover:shadow-lg
+              {% else %}
+                  text-pink-400 border border-pink-600 hover:bg-pink-50
+              {% endif %}
+            w-full">
+              <a class="flex py-2.5 px-5" href="{% url 'post_detail' post.slug %}?action=love" >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                  Love
+              </a>
+            </button>
+          </div>
+          <div class="w-1/3 h-12 m-2">
+            <button id="insightful-btn" class="focus:outline-none text-white text-sm rounded-md
+            {% if reaction == 'insightful' %}
+                  text-white bg-yellow-400 hover:bg-yellow-600 hover:shadow-lg
+              {% else %}
+                  text-yellow-400 border border-yellow-600 hover:bg-yellow-50
+              {% endif %}
+            w-full">
+              <a class="flex py-2.5 px-5" href="{% url 'post_detail' post.slug %}?action=insightful" >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                  Insightful
+              </a>
+            </button>
+          </div>
+        </div>
+    </div>
+  </div>       
+</div>
+
+<section class="text-gray-600 body-font overflow-hidden">
+  {% include "blog/post_comment.html" %}    
+</section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  var openmodal = document.querySelectorAll('.modal-open')
+  for (var i = 0; i < openmodal.length; i++) {
+    openmodal[i].addEventListener('click', function(event){
+    event.preventDefault()
+    toggleModal()
+    })
+  }
+  
+  const overlay = document.querySelector('.modal-overlay')
+  overlay.addEventListener('click', toggleModal)
+  
+  var closemodal = document.querySelectorAll('.modal-close')
+  for (var i = 0; i < closemodal.length; i++) {
+    closemodal[i].addEventListener('click', toggleModal)
+  }
+  
+  document.onkeydown = function(evt) {
+    evt = evt || window.event
+    var isEscape = false
+    if ("key" in
+
+evt) {
+    isEscape = (evt.key === "Escape" || evt.key === "Esc")
+    } else {
+    isEscape = (evt.keyCode === 27)
+    }
+    if (isEscape && document.body.classList.contains('modal-active')) {
+    toggleModal()
+    }
+  };
+  
+  
+  function toggleModal () {
+    const body = document.querySelector('body')
+    const modal = document.querySelector('.modal')
+    modal.classList.toggle('opacity-0')
+    modal.classList.toggle('pointer-events-none')
+    body.classList.toggle('modal-active')
+  }
+  
+   
+  function copyPath() {
+    var copyText = document.getElementById("copy-btn");
+
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+    document.execCommand("copy");
+
+    alert("Copied the text: " + copyText.value);
+} 
+</script>
+{% endblock %}
